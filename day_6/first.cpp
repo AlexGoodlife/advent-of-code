@@ -34,26 +34,12 @@ public:
 
 std::array<struct Vector2, 4> directions = {Vector2(-1,0), Vector2(0,1), Vector2(1,0), Vector2(0,-1)};
 
-int map_starting_position(char x){
-  switch(x){
-    case '^' : return 0;
-    case '>' : return 1;
-    case 'v' : return 2;
-    case '<' : return 3;
-  }
-  return 0;
-}
-
 bool in_bounds(int y, int x, int n, int m){
   return (y >= 0 && y < n) && (x >= 0 && x < m);
 }
 
 int trace_path(std::vector<std::string> grid){
-  std::vector<std::string> cpy;
   std::unordered_set<Vector2, Vector2::hash_func> dist;
-  for(const auto& s : grid){
-    cpy.push_back(s);
-  }
 
   //find where guard lies
   int x, y;
@@ -77,10 +63,9 @@ int trace_path(std::vector<std::string> grid){
     }
     else{
       dist.insert(Vector2(y,x));
-      cpy[y][x] = 'X';
+      y += dir.x;
+      x += dir.y;
     }
-    y += dir.x;
-    x += dir.y;
   }
 
 

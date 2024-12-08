@@ -1,116 +1,128 @@
 #include <cstdio>
 #include <iostream>
-#include <sstream>
-#include <stack>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
 #include <vector>
+#include <array>
 
-bool is_correct(std::vector<int>& update, std::unordered_map<int, std::vector<int>>& orders){
-  std::unordered_set<int> already_appeared;
 
-  for(const int& page : update){
-    for(const int& requirement : orders[page]){
-      if(already_appeared.find(requirement) != already_appeared.end()){
-        return false;
+struct Vector2{
+  int x;
+  int y;
+
+public:
+  Vector2(int x, int y) {
+    this->x = x;
+    this->y = y;
+  }
+  bool operator==(const Vector2& otherPoint) const
+  {
+    if (this->x == otherPoint.x && this->y == otherPoint.y) return true;
+    else return false;
+  }
+
+  struct hash_func
+  {
+    size_t operator()(const Vector2& point) const
+    {
+      size_t xHash = std::hash<int>()(point.x);
+      size_t yHash = std::hash<int>()(point.y) << 1;
+      return xHash ^ yHash;
+    }
+  };
+
+  struct pair_hash_func
+  {
+    size_t operator()(const std::pair<Vector2,Vector2>& point) const
+    {
+      Vector2::hash_func f;
+      return f(point.first) ^ f(point.second);
+    }
+  };
+};
+
+std::array<struct Vector2, 4> directions = {Vector2(-1,0), Vector2(0,1), Vector2(1,0), Vector2(0,-1)};
+
+bool in_bounds(int y, int x, int n, int m){
+  return (y >= 0 && y < n) && (x >= 0 && x < m);
+}
+//Return wether we are looping or not
+bool path_loops(std::vector<std::string>& grid, int y, int x, int dir_index){
+  std::unordered_set<std::pair<Vector2,Vector2>, Vector2::pair_hash_func> dist;
+
+  Vector2 dir = directions[dir_index];
+  while(in_bounds(y,x,grid.size(), grid[0].size())){
+    if(grid[y][x] == '#' || grid[y][x] == 'O'){
+      y -= dir.x;
+      x -= dir.y;
+      dir_index = (dir_index + 1) % directions.size();
+      dir = directions[dir_index];
+    }
+    else{
+      //We have looped and are going in the same direction
+      if(dist.find(std::make_pair(Vector2(y,x), dir)) != dist.end()){
+        return true;
+      }
+      dist.insert(std::make_pair(Vector2(y,x), dir));
+      y += dir.x;
+      x += dir.y;
+    }
+  }
+
+  return false;
+}
+
+// Very inneficient solution, essentially just bruteforcing every possible position
+int find_loops(std::vector<std::string> grid){
+  //find where guard lies
+  std::unordered_set<Vector2, Vector2::hash_func> visited;
+  int x, y;
+  for(int i  = 0; i < (int)grid.size();i++){
+    for(int j = 0; j < (int)grid[0].size(); j++){
+      if(grid[i][j] == '^'){
+        y = i;
+        x = j;
       }
     }
-    already_appeared.insert(page);
   }
-  return true;
-}
 
-void swap(int& a, int &b){
-  int tmp = a;
-  a = b;
-  b = tmp;
-}
-
-void dfs(int v, std::unordered_set<int> &elements, std::unordered_map<int, std::vector<int>> &orders, std::unordered_set<int>& visited, std::stack<int>& stack){
-  visited.insert(v);
-
-  for(const auto& neighbour : orders[v]){
-    if(elements.find(neighbour) != elements.end() && visited.find(neighbour) == visited.end()){
-      dfs(neighbour, elements, orders, visited,stack);
+  int dir_index = 0;
+  Vector2 dir = directions[dir_index];
+  int result = 0;
+  int start_x = x;
+  int start_y = y;
+  y += dir.x;
+  x += dir.y;
+  while (in_bounds(y, x, grid.size(), grid[0].size())) {
+    if (grid[y][x] == '#' ) {
+      y -= dir.x;
+      x -= dir.y;
+      dir_index = (dir_index + 1) % directions.size();
+      dir = directions[dir_index];
+      y += dir.x;
+      x += dir.y;
+    } else {
+      if(grid[y][x] != '^' && (visited.find(Vector2(x,y)) == visited.end())){
+        grid[y][x] = 'O';
+        visited.insert(Vector2(x,y));
+        if(path_loops(grid, start_y, start_x, 0)){
+          result++;
+        }
+        grid[y][x] = '.';
+      }
+      y += dir.x;
+      x += dir.y;
     }
-  }
-  stack.push(v);
-}
-
-// https://en.wikipedia.org/wiki/Topological_sorting
-// Topological sort, go through the vector, dfs through its dependencies and their dependencies, put them on a stack so they are always
-// before each other, the stack ends up being perfectly sorted and balanced according to the dependencies
-std::vector<int> correct_update(std::vector<int> &update, std::unordered_map<int, std::vector<int>> &orders) {
-
-  std::unordered_set<int> visited;
-  std::vector<int> result;
-  std::unordered_set<int> elements;
-  std::stack<int> stack;
-  for(const auto& i : update){
-    elements.insert(i);
-  }
-  for (const auto& i : update) {
-    if(visited.find(i) == visited.end()){
-      dfs(i,elements,orders,visited,stack);
-    }
-  }
-
-  while(!stack.empty()){
-    result.push_back(stack.top());
-    stack.pop();
   }
   return result;
 }
 
 int main() {
-
   std::string line;
-  std::unordered_map<int, std::vector<int>> orders;
-  std::vector<std::pair<int, int>> pairs;
-  while (getline(std::cin, line) && line != "") { // Read all pairings
-    int key;
-    int value;
-    char _t;
-    std::stringstream s(line);
-
-    s >> key;
-    s >> _t;
-    s >> value;
-    pairs.push_back(std::make_pair(key, value));
-    if (orders.find(key) != orders.end())
-      orders[key].push_back(value);
-    else
-      orders[key] = {value};
+  std::vector<std::string> grid;
+  while (getline(std::cin, line)) { // Read all pairings
+    grid.push_back(line);
   }
-
-  std::vector<std::vector<int>> updates;
-  while (getline(std::cin, line)) {
-    updates.push_back({});
-    std::stringstream s(line);
-    char _c;
-    int page;
-    while (!s.eof()) {
-      s >> page;
-      s >> _c;
-      updates[updates.size() - 1].push_back(page);
-    }
-  }
-
-  std::vector<std::vector<int> *> incorrect_updates;
-  for (auto &update : updates) {
-    if (!is_correct(update, orders)) {
-      incorrect_updates.push_back(&update);
-    }
-  }
-
-  int result = 0;
-  for (const auto &update : incorrect_updates) {
-    std::vector corrected = correct_update(*update, orders);
-    result += corrected[corrected.size() / 2];
-  }
-  std::cout << result << std::endl;
-
+  std::cout << find_loops(grid) << std::endl;
   return 0;
 }
