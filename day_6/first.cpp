@@ -6,24 +6,24 @@
 #include <array>
 
 
-struct Point{
+struct Vec2{
   int x;
   int y;
 
 public:
-  Point(int x, int y) {
+  Vec2(int x, int y) {
     this->x = x;
     this->y = y;
   }
-  bool operator==(const Point& otherPoint) const
+  bool operator==(const Vec2& otherVec2) const
   {
-    if (this->x == otherPoint.x && this->y == otherPoint.y) return true;
+    if (this->x == otherVec2.x && this->y == otherVec2.y) return true;
     else return false;
   }
 
   struct hash_func
   {
-    size_t operator()(const Point& point) const
+    size_t operator()(const Vec2& point) const
     {
       size_t xHash = std::hash<int>()(point.x);
       size_t yHash = std::hash<int>()(point.y) << 1;
@@ -32,14 +32,14 @@ public:
   };
 };
 
-std::array<struct Point, 4> directions = {Point(-1,0), Point(0,1), Point(1,0), Point(0,-1)};
+std::array<struct Vec2, 4> directions = {Vec2(-1,0), Vec2(0,1), Vec2(1,0), Vec2(0,-1)};
 
 bool in_bounds(int y, int x, int n, int m){
   return (y >= 0 && y < n) && (x >= 0 && x < m);
 }
 
 int trace_path(std::vector<std::string> grid){
-  std::unordered_set<Point, Point::hash_func> dist;
+  std::unordered_set<Vec2, Vec2::hash_func> dist;
 
   //find where guard lies
   int x, y;
@@ -53,7 +53,7 @@ int trace_path(std::vector<std::string> grid){
   }
 
   int dir_index = 0;
-  Point dir = directions[dir_index];
+  Vec2 dir = directions[dir_index];
   while(in_bounds(y,x,grid.size(), grid[0].size())){
     if(grid[y][x] == '#'){
       y -= dir.x;
@@ -62,7 +62,7 @@ int trace_path(std::vector<std::string> grid){
       dir = directions[dir_index];
     }
     else{
-      dist.insert(Point(y,x));
+      dist.insert(Vec2(y,x));
       y += dir.x;
       x += dir.y;
     }

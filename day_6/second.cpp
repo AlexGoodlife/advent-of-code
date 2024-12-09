@@ -15,9 +15,9 @@ public:
     this->x = x;
     this->y = y;
   }
-  bool operator==(const Vector2& otherPoint) const
+  bool operator==(const Vector2& otherVec) const
   {
-    if (this->x == otherPoint.x && this->y == otherPoint.y) return true;
+    if (this->x == otherVec.x && this->y == otherVec.y) return true;
     else return false;
   }
 

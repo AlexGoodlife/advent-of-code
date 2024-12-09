@@ -1,23 +1,12 @@
 #include <cmath>
 #include <cstdio>
 #include <iostream>
-#include <stack>
 #include <string>
-#include <sstream>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 using namespace std;
-struct Pointf{
-  double x;
-  double y;
-public:
-  Pointf(double x, double y) {
-    this->x = x;
-    this->y = y;
-  }
-};
 
 struct Point{
   int x;
