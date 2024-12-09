@@ -4,25 +4,25 @@
 #include <vector>
 #include <array>
 
-struct Vector2{
+struct Point{
   int x;
   int y;
 
 public:
-  Vector2(int x, int y) {
+  Point(int x, int y) {
     this->x = x;
     this->y = y;
   }
 };
 
-std::array<struct Vector2, 8> directions = {Vector2(0,1), Vector2(1,0), Vector2(0,-1), Vector2(-1,0), Vector2(1,1), Vector2(-1,1), Vector2(1,-1), Vector2(-1,-1)};
+std::array<struct Point, 8> directions = {Point(0,1), Point(1,0), Point(0,-1), Point(-1,0), Point(1,1), Point(-1,1), Point(1,-1), Point(-1,-1)};
 
 bool in_bounds(int y, int x, int n, int m){
   return (y >= 0 && y < n) && (x >= 0 && x < m);
 }
 
 
-bool search_helper(std::vector<std::string> mat, int y, int x,Vector2 dir, std::string needle, int index){
+bool search_helper(std::vector<std::string> mat, int y, int x,Point dir, std::string needle, int index){
 
   if(index == (int)needle.size()){
     return true;
@@ -39,7 +39,7 @@ bool search_helper(std::vector<std::string> mat, int y, int x,Vector2 dir, std::
   }
 }
 
-bool search(std::vector<std::string> mat, int y, int x,Vector2 dir, std::string needle){
+bool search(std::vector<std::string> mat, int y, int x,Point dir, std::string needle){
   return search_helper(mat, y, x, dir, needle, 0);
 }
 
