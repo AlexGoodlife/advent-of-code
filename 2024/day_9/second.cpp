@@ -135,7 +135,6 @@ long compute_checksum(vector<int> &disk){
 
 int main() {
   string line;
-  vector<string> grid;
   string input;
   cin >> input;
 

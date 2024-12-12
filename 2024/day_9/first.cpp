@@ -1,11 +1,7 @@
 #include <cmath>
 #include <cstdio>
 #include <iostream>
-#include <list>
-#include <memory>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 #include <sstream>
 
@@ -75,7 +71,6 @@ long compute_checksum(vector<int> &disk){
 
 int main() {
   string line;
-  vector<string> grid;
   string input;
   cin >> input;
   vector<int> disk = build_disk(input);
