@@ -60,7 +60,6 @@ unsigned long blink_times(
 
 int main() {
   string line;
-  vector<string> grid;
   list<unsigned long> stones;
   getline(cin, line);
   stringstream s(line);

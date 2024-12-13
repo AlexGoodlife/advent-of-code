@@ -36,7 +36,6 @@ void blink(list<long>& stones){
 
 int main() {
   string line;
-  vector<string> grid;
   list<long> stones;
   getline(cin, line);
   stringstream s(line);
